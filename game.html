@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Emoji Rain Rush – Clicker Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+
+    .return-links {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 14px;
+  margin: 10px;
+  width: fit-content;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-weight: 600;
+}
+
+.return-links a {
+  color: #0b3d91;
+  text-decoration: none;
+}
+
+.return-links a:hover {
+  text-decoration: underline;
+}
+
+    :root {
+      --bg: radial-gradient(circle at top, #fef3c7 0%, #1d1b4c 45%, #020617 100%);
+      --panel: rgba(15, 23, 42, 0.92);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --danger: #f97373;
+      --good: #4ade80;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.55);
+      --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 960px;
+      background: var(--panel);
+      border-radius: 22px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-subtle);
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.4fr);
+      overflow: hidden;
+    }
+
+    @media (max-width: 780px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left side: info & controls */
+    .side {
+      padding: 1.4rem 1.6rem;
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      background: linear-gradient(
+          120deg,
+          rgba(56, 189, 248, 0.1),
+          transparent 40%
+        ),
+        linear-gradient(
+          320deg,
+          rgba(244, 114, 182, 0.08),
+          transparent 45%
+        ),
+        rgba(15, 23, 42, 0.96);
+    }
+
+    @media (max-width: 780px) {
+      .side {
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .logo-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #facc15, #f97316);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 0 14px rgba(248, 250, 252, 0.5);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
+    }
+
+    .logo-title {
+      font-weight: 650;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-size: 0.86rem;
+    }
+
+    .logo-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 0.12rem 0.7rem;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: linear-gradient(
+        to right,
+        rgba(56, 189, 248, 0.15),
+        rgba(15, 23, 42, 0.9)
+      );
+      color: var(--accent);
+      letter-spacing: 0.08em;
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
+    }
+
+    .title-block h1 {
+      font-size: 1.4rem;
+      line-height: 1.2;
+      margin-bottom: 0.3rem;
+    }
+
+    .title-block p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 0.6rem;
+    }
+
+    .stat {
+      flex: 1 1 90px;
+      min-width: 0;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 0.4rem 0.65rem 0.45rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      font-size: 0.78rem;
+    }
+
+    .stat-label {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-size: 0.65rem;
+    }
+
+    .stat-value {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .controls {
+      margin-top: 0.4rem;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 0.7rem 0.7rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .row-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    select {
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.85);
+      background: #020617;
+      color: var(--text-main);
+      font-size: 0.78rem;
+      outline: none;
+    }
+
+    .btn {
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, #38bdf8, #6366f1);
+      color: #0b1020;
+      box-shadow: 0 10px 24px rgba(56, 189, 248, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.6);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    .hint-line {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .key-chip {
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.85);
+      padding: 0.05rem 0.4rem;
+      font-size: 0.7rem;
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-main);
+    }
+
+    .status-text {
+      margin-top: 0.1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .status-text span {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .status-text.paused span {
+      color: var(--danger);
+    }
+
+    .back-link {
+      margin-top: auto;
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding-top: 0.4rem;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Right side: game area */
+    .game {
+      padding: 1.1rem 1.1rem 1.3rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .top-panel {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .pill-label {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.65rem;
+    }
+
+    .pill-value {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .timer-track {
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(to right, #22c55e, #facc15, #fb923c, #ef4444);
+      transform-origin: left center;
+      transform: scaleX(1);
+      transition: transform 0.12s linear;
+    }
+
+    .playfield-wrapper {
+      flex: 1;
+      margin-top: 0.3rem;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .playfield {
+      position: relative;
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.15), transparent 55%),
+        radial-gradient(circle at 80% 100%, rgba(244, 114, 182, 0.1), transparent 55%),
+        #020617;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.95);
+    }
+
+    .playfield::after {
+      content: "Tap the falling emojis! Avoid the bombs 💣";
+      position: absolute;
+      left: 50%;
+      bottom: 9px;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .emoji {
+      position: absolute;
+      font-size: 2.1rem;
+      pointer-events: auto;
+      cursor: pointer;
+      user-select: none;
+      transform: translateY(-100%);
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    .emoji.good {
+      text-shadow: 0 0 10px rgba(74, 222, 128, 0.9);
+    }
+
+    .emoji.bad {
+      text-shadow: 0 0 10px rgba(248, 113, 113, 0.9);
+    }
+
+    .emoji.pop {
+      animation: pop-out 0.18s ease-out forwards;
+    }
+
+    @keyframes fall {
+      from {
+        transform: translateY(-110%);
+      }
+      to {
+        transform: translateY(110%);
+      }
+    }
+
+    @keyframes pop-out {
+      from {
+        transform: scale(1);
+        opacity: 1;
+      }
+      to {
+        transform: scale(0.25);
+        opacity: 0;
+      }
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.97));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease-out;
+    }
+
+    .overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .overlay-card {
+      background: rgba(15, 23, 42, 0.98);
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      padding: 1rem 1rem 0.9rem;
+      text-align: center;
+      width: min(290px, 94%);
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.98);
+    }
+
+    .overlay-card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .overlay-card p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .overlay-scores {
+      display: flex;
+      justify-content: center;
+      gap: 1.1rem;
+      margin-bottom: 0.7rem;
+      font-size: 0.76rem;
+    }
+
+    .overlay-scores span {
+      display: flex;
+      flex-direction: column;
+      gap: 0.12rem;
+    }
+
+    .overlay-label {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-size: 0.6rem;
+    }
+
+    .overlay-value {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .overlay-card .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="return-links">
+  <a href="main_page.html">← Back to Hiking Page</a>
+</div>
+
+  <main class="app">
+    <!-- LEFT: info & controls -->
+    <section class="side">
+      <div class="header-row">
+        <div class="logo-group">
+          <div class="logo-badge">🎉</div>
+          <div class="logo-text">
+            <div class="logo-title">Emoji Rain Rush</div>
+            <div class="logo-sub">Click fast • dodge chaos</div>
+          </div>
+        </div>
+        <div class="chip">
+          <span class="chip-dot"></span>
+          AI + Student Project
+        </div>
+      </div>
+
+      <div class="title-block">
+        <h1>Catch the fun emojis. Dodge the cursed ones.</h1>
+        <p>
+          Emojis fall from the sky. Click good ones for points, but avoid bombs 💣,
+          ghosts 👻, and poop 💩 or you’ll lose hearts. You get 30 seconds. Go.
+        </p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-label">Best Score</span>
+          <span class="stat-value" id="bestScoreLabel">–</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Last Score</span>
+          <span class="stat-value" id="lastScoreLabel">–</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Difficulty</span>
+          <span class="stat-value" id="difficultyLabel">Normal</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="row">
+          <span class="row-label">Difficulty</span>
+          <select id="difficultySelect">
+            <option value="easy">Easy • chill rain</option>
+            <option value="normal" selected>Normal • stormy</option>
+            <option value="hard">Hard • emoji tornado</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <button class="btn btn-primary" id="startBtn">▶ Start Game</button>
+          <button class="btn btn-secondary" id="pauseBtn" disabled>⏸ Pause</button>
+        </div>
+
+        <div class="hint-line">
+          <span class="key-chip">Space</span> start / pause quickly
+        </div>
+      </div>
+
+      <p class="status-text" id="statusText">
+        Status: <span>Waiting to start…</span>
+      </p>
+
+      <!-- Link from your scratch page back to it -->
+      <a class="back-link" href="main_page.html">
+        ← Back to main page
+      </a>
+    </section>
+
+    <!-- RIGHT: game area -->
+    <section class="game">
+      <div class="top-panel">
+        <div class="pill">
+          <span class="pill-label">Time</span>
+          <span class="pill-value" id="timeLabel">30.0s</span>
+        </div>
+        <div class="pill">
+          <span class="pill-label">Score</span>
+          <span class="pill-value" id="scoreLabel">0</span>
+        </div>
+        <div class="pill">
+          <span class="pill-label">Lives</span>
+          <span class="pill-value" id="livesLabel">❤️❤️❤️</span>
+        </div>
+        <div class="timer-track">
+          <div class="timer-fill" id="timerFill"></div>
+        </div>
+      </div>
+
+      <div class="playfield-wrapper">
+        <div class="playfield" id="playfield">
+          <div class="overlay" id="overlay">
+            <div class="overlay-card">
+              <h2>Round over! 🎮</h2>
+              <p id="overlayMessage">
+                Nice run. Want to see if you can beat your score?
+              </p>
+
+              <div class="overlay-scores">
+                <span>
+                  <span class="overlay-label">Score</span>
+                  <span class="overlay-value" id="overlayScore">0</span>
+                </span>
+                <span>
+                  <span class="overlay-label">Best</span>
+                  <span class="overlay-value" id="overlayBest">0</span>
+                </span>
+              </div>
+
+              <button class="btn btn-primary" id="playAgainBtn">🔁 Play again</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ===== GAME CONSTANTS =====
+    const GAME_DURATION = 30_000; // 30 seconds
+    const MAX_LIVES = 3;
+
+    const GOOD_EMOJIS = ["⭐", "😺", "🍕", "🦄", "🌈", "🧁", "🎈", "🐸", "🎵"];
+    const BAD_EMOJIS = ["💣", "👻", "💩"];
+
+    const difficultySettings = {
+      easy: {
+        spawnMin: 600,
+        spawnMax: 1000,
+        fallDuration: 4500,
+      },
+      normal: {
+        spawnMin: 430,
+        spawnMax: 800,
+        fallDuration: 3500,
+      },
+      hard: {
+        spawnMin: 260,
+        spawnMax: 600,
+        fallDuration: 2600,
+      },
+    };
+
+    // ===== GAME STATE =====
+    let score = 0;
+    let bestScore = 0;
+    let lastScore = null;
+    let lives = MAX_LIVES;
+    let timeRemaining = GAME_DURATION;
+
+    let currentDifficulty = "normal";
+
+    let gameRunning = false;
+    let gamePaused = false;
+    let lastTimestamp = null;
+
+    let timerFrameId = null;
+    let spawnTimeoutId = null;
+
+    // ===== DOM ELEMENTS =====
+    const playfield = document.getElementById("playfield");
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const difficultySelect = document.getElementById("difficultySelect");
+
+    const scoreLabel = document.getElementById("scoreLabel");
+    const livesLabel = document.getElementById("livesLabel");
+    const timeLabel = document.getElementById("timeLabel");
+    const timerFill = document.getElementById("timerFill");
+
+    const bestScoreLabel = document.getElementById("bestScoreLabel");
+    const lastScoreLabel = document.getElementById("lastScoreLabel");
+    const difficultyLabel = document.getElementById("difficultyLabel");
+
+    const statusText = document.getElementById("statusText");
+
+    const overlay = document.getElementById("overlay");
+    const overlayScore = document.getElementById("overlayScore");
+    const overlayBest = document.getElementById("overlayBest");
+    const overlayMessage = document.getElementById("overlayMessage");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+
+    // ===== UTILS =====
+    function randomBetween(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function choice(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function setStatus(message, type = "normal") {
+      statusText.querySelector("span").textContent = message;
+      statusText.classList.toggle("paused", type === "paused");
+    }
+
+    function updateDifficultyLabel() {
+      const pretty =
+        currentDifficulty === "easy"
+          ? "Easy"
+          : currentDifficulty === "hard"
+          ? "Hard"
+          : "Normal";
+      difficultyLabel.textContent = pretty;
+    }
+
+    function updateScoreView() {
+      scoreLabel.textContent = score;
+      const hearts = "❤️".repeat(lives) + "🤍".repeat(MAX_LIVES - lives);
+      livesLabel.textContent = hearts;
+    }
+
+    function updateTimeView() {
+      const secs = (timeRemaining / 1000).toFixed(1);
+      timeLabel.textContent = `${secs}s`;
+      const ratio = Math.max(timeRemaining / GAME_DURATION, 0);
+      timerFill.style.transform = `scaleX(${ratio})`;
+    }
+
+    function loadBestScore() {
+      const stored = localStorage.getItem("emojiRainBest");
+      if (stored !== null) {
+        const value = parseInt(stored, 10);
+        if (!Number.isNaN(value)) {
+          bestScore = value;
+          bestScoreLabel.textContent = bestScore;
+          return;
+        }
+      }
+      bestScoreLabel.textContent = "–";
+    }
+
+    loadBestScore();
+    updateScoreView();
+    updateTimeView();
+    updateDifficultyLabel();
+
+    // ===== EMOJI SPAWNING =====
+    function spawnEmoji() {
+      if (!gameRunning || gamePaused) return;
+
+      const isBad = Math.random() < 0.22; // ~22% chance of bad emoji
+      const emojiChar = isBad ? choice(BAD_EMOJIS) : choice(GOOD_EMOJIS);
+
+      const el = document.createElement("div");
+      el.classList.add("emoji");
+      el.classList.add(isBad ? "bad" : "good");
+      el.textContent = emojiChar;
+
+      const rect = playfield.getBoundingClientRect();
+      const maxX = rect.width - 40;
+      const x = randomBetween(10, maxX);
+
+      el.style.left = `${x}px`;
+
+      const fallDuration = difficultySettings[currentDifficulty].fallDuration;
+      el.style.animationDuration = `${fallDuration}ms`;
+
+      // Click handler
+      el.addEventListener("click", () => {
+        if (!gameRunning || gamePaused) return;
+
+        if (isBad) {
+          // Hit bad emoji
+          lives = Math.max(0, lives - 1);
+          updateScoreView();
+          if (lives <= 0) {
+            endGame();
+          }
+        } else {
+          // Hit good emoji
+          score++;
+          updateScoreView();
+        }
+
+        el.classList.add("pop");
+        // remove after animation
+        setTimeout(() => {
+          el.remove();
+        }, 180);
+      });
+
+      // When animation ends (emoji reaches bottom)
+      const handleFallEnd = () => {
+        el.remove();
+      };
+      el.addEventListener("animationend", handleFallEnd);
+
+      playfield.appendChild(el);
+
+      // Schedule next emoji
+      const { spawnMin, spawnMax } = difficultySettings[currentDifficulty];
+      const delay = randomBetween(spawnMin, spawnMax);
+      spawnTimeoutId = setTimeout(spawnEmoji, delay);
+    }
+
+    function clearEmojis() {
+      const all = playfield.querySelectorAll(".emoji");
+      all.forEach((el) => el.remove());
+    }
+
+    // ===== TIMER LOOP =====
+    function tick(timestamp) {
+      if (!gameRunning || gamePaused) return;
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const delta = timestamp - lastTimestamp;
+      lastTimestamp = timestamp;
+
+      timeRemaining -= delta;
+      if (timeRemaining <= 0) {
+        timeRemaining = 0;
+        updateTimeView();
+        endGame();
+        return;
+      }
+
+      updateTimeView();
+      timerFrameId = requestAnimationFrame(tick);
+    }
+
+    // ===== GAME CONTROL =====
+    function resetGameState() {
+      score = 0;
+      lives = MAX_LIVES;
+      timeRemaining = GAME_DURATION;
+      updateScoreView();
+      updateTimeView();
+      clearEmojis();
+    }
+
+    function startGame() {
+      if (gameRunning && !gamePaused) {
+        // restart
+        resetGameState();
+      } else {
+        resetGameState();
+      }
+
+      gameRunning = true;
+      gamePaused = false;
+      lastTimestamp = null;
+      overlay.classList.remove("visible");
+
+      startBtn.textContent = "▶ Restart";
+      pauseBtn.disabled = false;
+      pauseBtn.textContent = "⏸ Pause";
+      setStatus("Game on! Tap the good emojis.", "normal");
+
+      // Start loops
+      spawnEmoji();
+      timerFrameId = requestAnimationFrame(tick);
+    }
+
+    function pauseGame() {
+      if (!gameRunning) return;
+
+      if (gamePaused) {
+        // resume
+        gamePaused = false;
+        lastTimestamp = null;
+        pauseBtn.textContent = "⏸ Pause";
+        setStatus("Game on! Tap the good emojis.", "normal");
+        timerFrameId = requestAnimationFrame(tick);
+        spawnEmoji();
+      } else {
+        // pause
+        gamePaused = true;
+        pauseBtn.textContent = "▶ Resume";
+        setStatus("Paused – deep breath.", "paused");
+        if (timerFrameId) cancelAnimationFrame(timerFrameId);
+        if (spawnTimeoutId) clearTimeout(spawnTimeoutId);
+      }
+    }
+
+    function endGame() {
+      if (!gameRunning) return;
+      gameRunning = false;
+      gamePaused = false;
+
+      if (timerFrameId) cancelAnimationFrame(timerFrameId);
+      if (spawnTimeoutId) clearTimeout(spawnTimeoutId);
+      clearEmojis();
+
+      lastScore = score;
+      lastScoreLabel.textContent = lastScore;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestScoreLabel.textContent = bestScore;
+        localStorage.setItem("emojiRainBest", String(bestScore));
+        overlayMessage.textContent = "New high score! Your clicking powers are unmatched. 🏆";
+      } else if (score === 0) {
+        overlayMessage.textContent = "Zero?! The emojis won this round. Try again!";
+      } else if (lives <= 0) {
+        overlayMessage.textContent = "You lost all your hearts 💔 but that was intense!";
+      } else {
+        overlayMessage.textContent = "Nice! Think you can squeeze in a few more clicks?";
+      }
+
+      overlayScore.textContent = score;
+      overlayBest.textContent = bestScore;
+      overlay.classList.add("visible");
+
+      pauseBtn.disabled = true;
+      pauseBtn.textContent = "⏸ Pause";
+      setStatus("Finished – press Start to play again.", "normal");
+    }
+
+    // ===== EVENTS =====
+    startBtn.addEventListener("click", startGame);
+    pauseBtn.addEventListener("click", pauseGame);
+
+    difficultySelect.addEventListener("change", (e) => {
+      currentDifficulty = e.target.value;
+      updateDifficultyLabel();
+    });
+
+    playAgainBtn.addEventListener("click", () => {
+      overlay.classList.remove("visible");
+      startGame();
+    });
+
+    // Spacebar quick start / pause
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        if (!gameRunning) {
+          startGame();
+        } else {
+          pauseGame();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
